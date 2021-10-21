@@ -1,0 +1,15 @@
+{
+    "transaction_time": "2021-10-20T17:25:04.7341107",
+    "result_code": "OK",
+    "description": "OK",
+    "data":{
+    "id": 3,
+    "account": "CreateTest02",
+    "password": "CreateTest02",
+    "status": "UNREGISTERED",
+    "email": "CreateTest01@GMAIL.COM",
+    "phone_number": "010-1234-1234",
+    "registered_at": "2021-10-20T16:51:01",
+    "unregistered_at": null
+    }
+}
