@@ -5,9 +5,13 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import com.example.study.model.enumclass.UserStatus;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -36,7 +40,10 @@ public class User {
     
     private String account;
     private String password;
-    private String status;
+    
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+    
     private String email;
     private String phoneNumber;
 

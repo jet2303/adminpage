@@ -1,23 +1,26 @@
 package com.example.study.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.example.study.ifs.CrudInterface;
 import com.example.study.model.entity.User;
+import com.example.study.model.enumclass.UserStatus;
 import com.example.study.model.network.Header;
+import com.example.study.model.network.Pagenation;
 import com.example.study.model.network.request.UserApiRequest;
 import com.example.study.model.network.response.UserApiResponse;
 import com.example.study.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserApiLogicService implements CrudInterface<UserApiRequest, UserApiResponse>{
-
-    @Autowired
-    private UserRepository userRepository;
+public class UserApiLogicService extends BaseService<UserApiRequest, UserApiResponse, User>{
 
     //1.request data
     //2.user create
@@ -31,22 +34,22 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
         User user = User.builder()
                             .account(userApiRequest.getAccount())
                             .password(userApiRequest.getPassword())
-                            .status(userApiRequest.getStatus())
+                            .status(UserStatus.REGISTERED)
                             .email(userApiRequest.getEmail())
                             .phoneNumber(userApiRequest.getPhoneNumber())
                             .registeredAt(LocalDateTime.now())
                             .build();
-        User newUser = userRepository.save(user);
-        return response(newUser);
+        User newUser = baseRepository.save(user);
+        return Header.OK(response(newUser));
     }
 
 
     @Override
     public Header<UserApiResponse> read(Long id) {
-        Optional<User> optional = userRepository.findById(id);
+        Optional<User> optional = baseRepository.findById(id);
 
         return optional.map(
-                            user -> response(user)
+                            user -> Header.OK(response(user))
                             )
                         .orElseGet(
                             ()->Header.ERROR("not found data")
@@ -56,65 +59,88 @@ public class UserApiLogicService implements CrudInterface<UserApiRequest, UserAp
 
     @Override
     public Header<UserApiResponse> update(Header<UserApiRequest> request) {
-        //1.data get
-        UserApiRequest userRequest = request.getData();
-        //2.id -> user find
-        Optional<User> optional = userRepository.findById(userRequest.getId());
-
-
-    
         
-        return optional.map(
-            user -> {
-                user.setAccount(userRequest.getAccount())
-                    .setPassword(userRequest.getPassword())
-                    .setStatus(userRequest.getStatus())
-                    .setPhoneNumber(userRequest.getPhoneNumber())
-                    .setEmail(userRequest.getEmail());
-                    // .setRegisteredAt(userRequest.getRegisteredAt())
-                    // .setUnregisteredAt(userRequest.getUnregisteredAt());
-                return user;    
-            }
-        )
-            .map(user -> userRepository.save(user))
-            .map(updateUser -> response(updateUser))
-            .orElseGet( 
-                () -> Header.ERROR("not found id")
-                );
-
-        //3. update
-
-
-        //4. make userApiResponse 
-       
+        return Optional.ofNullable(request.getData())
+                        .map(body -> {
+                            return baseRepository.findById(body.getId());
+                        })
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .map(user -> {
+                            UserApiRequest body = request.getData();
+                            user.setAccount(body.getAccount())
+                                .setPassword(body.getPassword())
+                                .setStatus(body.getStatus())
+                                .setEmail(body.getEmail())
+                                .setPhoneNumber(body.getPhoneNumber());
+                            return user;
+                        })
+                        .map(updateUser -> baseRepository.save(updateUser))
+                        .map(updateUser -> Header.OK(response(updateUser)))
+                        .orElseGet( () -> Header.ERROR("not found Data"));
     }
 
     @Override
     public Header<UserApiResponse> delete(Long id) {
-        Optional<User> optional = userRepository.findById(id);
+        Optional<User> optional = baseRepository.findById(id);
 
         return optional.map(deleteUser->{
-                        userRepository.deleteById(deleteUser.getId());
+                        baseRepository.deleteById(deleteUser.getId());
                         return deleteUser;
                         })
-                        .map(updateUser->response(updateUser))
+                        .map(updateUser-> Header.OK(response(updateUser)))
                         .orElseGet( ()->Header.ERROR("don't delete data"));
     }
 
 
-    private Header<UserApiResponse> response(User user){
+    private UserApiResponse response(User user){
         UserApiResponse userApiResponse = UserApiResponse.builder()
             .id(user.getId())
             .account(user.getAccount())
             .password(user.getPassword())
             .email(user.getEmail())
             .phoneNumber(user.getPhoneNumber())
-            .status(user.getStatus())
+            .status(UserStatus.REGISTERED)
             .registeredAt(user.getRegisteredAt())
             .unregisteredAt(user.getUnregisteredAt())
             .build();
             
-        return Header.OK(userApiResponse);
+        return userApiResponse;
+    }
+
+    // private UserApiResponse pageResponse(User user){
+    //     UserApiResponse userApiResponse = UserApiResponse.builder()
+    //         .id(user.getId())
+    //         .account(user.getAccount())
+    //         .password(user.getPassword())
+    //         .email(user.getEmail())
+    //         .phoneNumber(user.getPhoneNumber())
+    //         .status(UserStatus.REGISTERED)
+    //         .registeredAt(user.getRegisteredAt())
+    //         .unregisteredAt(user.getUnregisteredAt())
+    //         .build();
+            
+    //     return userApiResponse;
+    // }
+
+
+    public Header<List<UserApiResponse>> search(Pageable pageable) {
+        Page<User> users = baseRepository.findAll(pageable);
+
+        List<UserApiResponse> userApiResponseList = users.stream()
+                .map(user -> response(user))
+                .collect(Collectors.toList());
+        
+        Pagenation pagenation = Pagenation.builder()
+                                            .totalPages(users.getTotalPages())
+                                            .totalElements(users.getTotalElements())
+                                            .currentPage(users.getNumber())
+                                            .currentElements(users.getNumberOfElements())
+                                            .build();
+
+
+
+        return Header.OK(userApiResponseList,pagenation);
     }
     
         

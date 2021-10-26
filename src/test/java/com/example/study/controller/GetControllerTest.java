@@ -20,9 +20,9 @@ public class GetControllerTest {
     @Test
     void testGetRequest() throws Exception{
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/get")
+            MockMvcRequestBuilders.get("/api/getMethod")
         ).andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.content().string("get"))
+        .andExpect(MockMvcResultMatchers.content().string("Hi getMethod"))
         .andDo(MockMvcResultHandlers.print());
 
     }
