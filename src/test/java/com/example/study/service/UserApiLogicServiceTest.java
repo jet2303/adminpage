@@ -2,14 +2,7 @@ package com.example.study.service;
 
 import java.time.LocalDateTime;
 
-import javax.print.attribute.standard.Media;
-
 import com.example.study.controller.api.UserApiController;
-import com.example.study.model.enumclass.UserStatus;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

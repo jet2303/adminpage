@@ -2,11 +2,8 @@ package com.example.study.model.network.request;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 
 import com.example.study.model.enumclass.UserStatus;
-import com.fasterxml.jackson.core.JsonParser.NumberType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

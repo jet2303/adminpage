@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @Builder
 @Accessors(chain = true)
-@Slf4j
 public class Partner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

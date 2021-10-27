@@ -2,8 +2,6 @@ package com.example.study.model.network;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SuppressWarnings("unchecked")      //Header<T> to Header<Object> Warning exclude
 public class Header<T> {
     //api 통신시간
     //@JsonProperty("transaction_time")   //해당 이름으로 바꿔줌
